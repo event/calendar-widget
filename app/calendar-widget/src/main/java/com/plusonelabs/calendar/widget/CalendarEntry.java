@@ -130,7 +130,6 @@ public class CalendarEntry extends WidgetEntry {
             if (isPartOfMultiDayEvent() && DateUtil.isMidnight(getEndDate())
                     && !isEndOfMultiDayEvent()) {
                 endStr = SPACE_ARROW;
-                separator = EMPTY_STRING;
             } else {
                 endStr = createTimeString(context, getEndDate());
             }
@@ -155,6 +154,36 @@ public class CalendarEntry extends WidgetEntry {
         }
         return DateUtil.formatDateTime(getSettings(), time,
                 DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_24HOUR);
+    }
+
+    public String getSimpleEventTimeString() {
+        StringBuilder sb =  new StringBuilder();
+        DateTime now = DateTime.now();
+        if (isPartOfMultiDayEvent()) {
+            sb.append(DateUtil.simpleFormatDate(getSettings(), getStartDate()
+                                                , now, DateUtil.TimeWithDate.YES_IF_TODAY));
+            if (getSettings().getShowEndTime()) {
+                sb.append(" - ").append(DateUtil.simpleFormatDate(getSettings(), 
+                                            getEndDate(), now, DateUtil.TimeWithDate.YES_IF_TODAY));
+            }
+        } else if (isAllDay()) {
+            sb.append(DateUtil.simpleFormatDate(getSettings(), getStartDate()
+                                                , now, DateUtil.TimeWithDate.NO));
+        } else if (DateUtil.sameDay(now, getStartDate())) {
+            sb.append(DateUtil.simpleFormatTime(getSettings(), getStartDate()));
+            if (getSettings().getShowEndTime()) {
+                sb.append(" - ")
+                    .append(DateUtil.simpleFormatTime(getSettings(), getEndDate()));
+            }
+        } else {
+            DateTime startDate = getStartDate();
+            sb.append(DateUtil.simpleFormatDate(getSettings(), startDate, now, DateUtil.TimeWithDate.ALWAYS));
+            if (getSettings().getShowEndTime()) {
+                sb.append(" - ")
+                    .append(DateUtil.simpleFormatTime(getSettings(), getEndDate()));
+            }
+        }
+        return sb.toString();
     }
 
     public InstanceSettings getSettings() {

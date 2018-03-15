@@ -19,8 +19,16 @@ public class DateUtil {
     private static volatile DateTime mNow = null;
     private static volatile DateTime mNowSetAt = DateTime.now();
 
+    public enum TimeWithDate {
+        NO, YES_IF_TODAY, ALWAYS
+    }
+    
     public static boolean isMidnight(DateTime date) {
         return date.isEqual(date.withTimeAtStartOfDay());
+    }
+
+    public static boolean sameDay(DateTime date1, DateTime date2) {
+        return date1.withTimeAtStartOfDay().isEqual(date2.withTimeAtStartOfDay());
     }
 
     public static String createDayHeaderTitle(InstanceSettings settings, DateTime dateTime) {
@@ -108,4 +116,24 @@ public class DateUtil {
         }
         return "";
     }
+
+    public static String simpleFormatDate(InstanceSettings settings, DateTime date, DateTime now, TimeWithDate twd){
+        StringBuilder sb = new StringBuilder();
+        int flags = 0;
+        if (date.getYear() == now.getYear()) {
+            flags = DateUtils.FORMAT_NO_YEAR;
+        }
+        sb.append(DateUtils.formatDateTime(settings.getContext(), date.getMillis()
+                                           , DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_NUMERIC_DATE | flags));
+        if (twd == TimeWithDate.ALWAYS || (twd == TimeWithDate.YES_IF_TODAY && sameDay(date, now))){
+            sb.append(" ").append(simpleFormatTime(settings, date));
+        }
+        return sb.toString();
+    }
+
+    public static String simpleFormatTime (InstanceSettings settings, DateTime time){
+        return DateUtils.formatDateTime(settings.getContext(), time.getMillis()
+                                        , DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_24HOUR);
+    }
+    
 }

@@ -40,36 +40,16 @@ public enum EventEntryLayout {
         @Override
         protected void setEventDate(CalendarEntry entry, RemoteViews rv) {
             if (entry.getSettings().getShowDayHeaders()) {
-                rv.setViewVisibility(R.id.event_entry_date, View.GONE);
-                rv.setViewVisibility(R.id.event_entry_date_right, View.GONE);
+                rv.setViewVisibility(R.id.event_entry_date_time, View.GONE);
             } else {
-                int days = entry.getDaysFromToday();
-                int viewToShow = days < -1 || days > 1 ? R.id.event_entry_date_right : R.id.event_entry_date;
-                int viewToHide = viewToShow == R.id.event_entry_date ? R.id.event_entry_date_right : R.id.event_entry_date;
-                rv.setViewVisibility(viewToHide, View.GONE);
-                rv.setViewVisibility(viewToShow, View.VISIBLE);
-                rv.setTextViewText(viewToShow, getDaysFromTodayString(entry.getSettings().getEntryThemeContext(), days));
-            }
-        }
-
-        private CharSequence getDaysFromTodayString(Context context, int daysFromToday) {
-            switch (daysFromToday) {
-                case -1:
-                    return context.getText(R.string.yesterday);
-                case 0:
-                    return context.getText(R.string.today);
-                case 1:
-                    return context.getText(R.string.tomorrow);
-                default:
-                    return Integer.toString(daysFromToday);
+                rv.setViewVisibility(R.id.event_entry_date_time, View.VISIBLE);
+                rv.setTextViewText(R.id.event_entry_date_time, entry.getSimpleEventTimeString());
+                setTextSize(entry.getSettings(), rv, R.id.event_entry_date_time, R.dimen.event_entry_date_time);
             }
         }
 
         @Override
         protected void setEventTime(CalendarEntry entry, RemoteViews rv) {
-            RemoteViewsUtil.setMultiline(rv, R.id.event_entry_time, entry.getSettings().getShowEndTime());
-            rv.setTextViewText(R.id.event_entry_time, entry.getEventTimeString().replace(CalendarEntry
-                    .SPACE_DASH_SPACE, " "));
         }
     };
 
