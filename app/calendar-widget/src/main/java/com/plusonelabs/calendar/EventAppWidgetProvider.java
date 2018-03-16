@@ -71,19 +71,10 @@ public class EventAppWidgetProvider extends AppWidgetProvider {
     }
 
     private void configureWidgetHeader(InstanceSettings settings, RemoteViews rv) {
-        configureCurrentDate(settings, rv);
         setActionIcons(settings, rv);
         configureAddEvent(settings, rv);
         configureRefresh(settings.getContext(), rv);
         configureOverflowMenu(settings, rv);
-    }
-
-    private void configureCurrentDate(InstanceSettings settings, RemoteViews rv) {
-        rv.setOnClickPendingIntent(R.id.calendar_current_date, createOpenCalendarPendingIntent(settings));
-        String formattedDate = DateUtil.createDateString(settings,
-                DateUtil.now(settings.getTimeZone())).toUpperCase(Locale.getDefault());
-        rv.setTextViewText(R.id.calendar_current_date, formattedDate);
-        setTextColorFromAttr(settings.getHeaderThemeContext(), rv, R.id.calendar_current_date, R.attr.header);
     }
 
     private void setActionIcons(InstanceSettings settings, RemoteViews rv) {
