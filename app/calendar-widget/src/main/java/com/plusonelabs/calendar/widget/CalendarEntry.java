@@ -4,6 +4,7 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.text.format.DateUtils;
+import android.util.Log;
 
 import com.plusonelabs.calendar.DateUtil;
 import com.plusonelabs.calendar.R;
@@ -84,7 +85,11 @@ public class CalendarEntry extends WidgetEntry {
     }
 
     public boolean spansOneFullDay() {
-        return getStartDate().plusDays(1).isEqual(getEndDate());
+        return spansOneFullDay(getEndDate());
+    }
+
+    public boolean spansOneFullDay(DateTime endDate) {
+        return getStartDate().plusDays(1).isEqual(endDate);
     }
 
     public CalendarEvent getEvent() {
@@ -159,28 +164,28 @@ public class CalendarEntry extends WidgetEntry {
     public String getSimpleEventTimeString() {
         StringBuilder sb =  new StringBuilder();
         DateTime now = DateTime.now();
+        DateTime endDate = getEvent().getEndDate();
         if (isPartOfMultiDayEvent()) {
             sb.append(DateUtil.simpleFormatDate(getSettings(), getStartDate()
-                                                , now, DateUtil.TimeWithDate.YES_IF_TODAY));
-            if (getSettings().getShowEndTime()) {
+                  , now, DateUtil.TimeWithDate.YES_IF_TODAY_AFTER_MIDNIGHT));
+            if (getSettings().getShowEndTime()
+                && !(DateUtil.isMidnight(endDate) && spansOneFullDay(endDate)))
+            {
                 sb.append(" - ").append(DateUtil.simpleFormatDate(getSettings(), 
-                                            getEndDate(), now, DateUtil.TimeWithDate.YES_IF_TODAY));
+                    endDate, now, DateUtil.TimeWithDate.YES_IF_TODAY_AFTER_MIDNIGHT));
             }
-        } else if (isAllDay()) {
-            sb.append(DateUtil.simpleFormatDate(getSettings(), getStartDate()
-                                                , now, DateUtil.TimeWithDate.NO));
         } else if (DateUtil.sameDay(now, getStartDate())) {
             sb.append(DateUtil.simpleFormatTime(getSettings(), getStartDate()));
             if (getSettings().getShowEndTime()) {
                 sb.append(" - ")
-                    .append(DateUtil.simpleFormatTime(getSettings(), getEndDate()));
+                    .append(DateUtil.simpleFormatTime(getSettings(), endDate));
             }
         } else {
             DateTime startDate = getStartDate();
             sb.append(DateUtil.simpleFormatDate(getSettings(), startDate, now, DateUtil.TimeWithDate.ALWAYS));
             if (getSettings().getShowEndTime()) {
                 sb.append(" - ")
-                    .append(DateUtil.simpleFormatTime(getSettings(), getEndDate()));
+                    .append(DateUtil.simpleFormatTime(getSettings(), endDate));
             }
         }
         return sb.toString();

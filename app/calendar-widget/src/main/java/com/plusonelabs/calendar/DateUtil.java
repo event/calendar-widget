@@ -20,7 +20,7 @@ public class DateUtil {
     private static volatile DateTime mNowSetAt = DateTime.now();
 
     public enum TimeWithDate {
-        NO, YES_IF_TODAY, ALWAYS
+        NO, YES_IF_TODAY_AFTER_MIDNIGHT, ALWAYS
     }
     
     public static boolean isMidnight(DateTime date) {
@@ -124,8 +124,11 @@ public class DateUtil {
             flags = DateUtils.FORMAT_NO_YEAR;
         }
         sb.append(DateUtils.formatDateTime(settings.getContext(), date.getMillis()
-                                           , DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_NUMERIC_DATE | flags));
-        if (twd == TimeWithDate.ALWAYS || (twd == TimeWithDate.YES_IF_TODAY && sameDay(date, now))){
+                , DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_NUMERIC_DATE | flags));
+        if (twd == TimeWithDate.ALWAYS
+            || (twd == TimeWithDate.YES_IF_TODAY_AFTER_MIDNIGHT && sameDay(date, now)
+                && date.isAfter(date.withTimeAtStartOfDay())))
+        {
             sb.append(" ").append(simpleFormatTime(settings, date));
         }
         return sb.toString();
