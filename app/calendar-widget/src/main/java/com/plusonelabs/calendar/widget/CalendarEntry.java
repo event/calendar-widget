@@ -165,8 +165,9 @@ public class CalendarEntry extends WidgetEntry {
         StringBuilder sb =  new StringBuilder();
         DateTime now = DateTime.now();
         DateTime endDate = getEvent().getEndDate();
+        DateTime startDate = getEvent().getStartDate();
         if (isPartOfMultiDayEvent()) {
-            sb.append(DateUtil.simpleFormatDate(getSettings(), getStartDate()
+            sb.append(DateUtil.simpleFormatDate(getSettings(), startDate
                   , now, DateUtil.TimeWithDate.YES_IF_TODAY_AFTER_MIDNIGHT));
             if (getSettings().getShowEndTime()
                 && !(DateUtil.isMidnight(endDate) && spansOneFullDay(endDate)))
@@ -174,14 +175,13 @@ public class CalendarEntry extends WidgetEntry {
                 sb.append(" - ").append(DateUtil.simpleFormatDate(getSettings(), 
                     endDate, now, DateUtil.TimeWithDate.YES_IF_TODAY_AFTER_MIDNIGHT));
             }
-        } else if (DateUtil.sameDay(now, getStartDate())) {
-            sb.append(DateUtil.simpleFormatTime(getSettings(), getStartDate()));
+        } else if (DateUtil.sameDay(now, startDate)) {
+            sb.append(DateUtil.simpleFormatTime(getSettings(), startDate));
             if (getSettings().getShowEndTime()) {
                 sb.append(" - ")
                     .append(DateUtil.simpleFormatTime(getSettings(), endDate));
             }
         } else {
-            DateTime startDate = getStartDate();
             sb.append(DateUtil.simpleFormatDate(getSettings(), startDate, now, DateUtil.TimeWithDate.ALWAYS));
             if (getSettings().getShowEndTime()) {
                 sb.append(" - ")
